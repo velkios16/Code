@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le Quart d'heure — culture générale quotidienne</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --nuit:#150E29; --velours:#1F1436; --relief:#2A1B48; --ligne:#3B2A63;
+  --craie:#F4EFFA; --brume:#A296C4;
+  --menthe:#3EE0AE; --ambre:#FFC24B; --grenat:#FF5F76;
+  --display:"Bricolage Grotesque","Trebuchet MS",sans-serif;
+  --body:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--nuit);color:var(--craie);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(80% 50% at 50% -10%, rgba(62,224,174,.16), transparent 60%),
+             radial-gradient(60% 40% at 90% 0%, rgba(255,194,75,.10), transparent 70%);}
+.wrap{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:24px 18px 72px}
+button{font-family:inherit}
+
+/* ---------- en-tête ---------- */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:30px;flex-wrap:wrap}
+.mark{font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:-.5px}
+.mark span{color:var(--menthe)}
+.clock{font-family:var(--mono);font-size:13px;color:var(--brume);text-align:right;line-height:1.4}
+.clock b{color:var(--craie);font-weight:700}
+
+/* ---------- cartes ---------- */
+.card{background:var(--velours);border:1px solid var(--ligne);border-radius:var(--r);padding:20px}
+h2.sect{font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--brume);margin:34px 0 12px}
+
+/* ---------- séries du jour ---------- */
+.series{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:620px){.series{grid-template-columns:1fr}}
+.serie-card{display:flex;flex-direction:column;gap:10px}
+.serie-card .lvl{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.serie-card.moyen .lvl{color:var(--menthe)}
+.serie-card.difficile .lvl{color:var(--ambre)}
+.serie-card .etat{font-size:14px;color:var(--brume);min-height:22px}
+.serie-card .etat b{color:var(--craie);font-family:var(--mono)}
+.btn{appearance:none;border:0;border-radius:12px;padding:13px 18px;font-weight:600;font-size:15px;cursor:pointer;transition:transform .08s ease,filter .15s ease}
+.btn:active{transform:scale(.98)}
+.btn-go{background:var(--menthe);color:#0B2A20}
+.serie-card.difficile .btn-go{background:var(--ambre);color:#3A2A00}
+.btn-go:hover{filter:brightness(1.07)}
+.btn[disabled]{background:var(--relief);color:var(--brume);cursor:default}
+.btn-ghost{background:transparent;color:var(--brume);border:1px solid var(--ligne)}
+.btn-ghost:hover{color:var(--craie);border-color:var(--brume)}
+
+/* ---------- tableau des jours ---------- */
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+@media(max-width:520px){.grid{grid-template-columns:repeat(4,1fr)}}
+.tile{background:var(--velours);border:1px solid var(--ligne);border-radius:12px;padding:8px 8px 10px;text-align:center}
+.tile .jour{font-family:var(--mono);font-size:11px;color:var(--brume);margin-bottom:6px}
+.tile .halves{display:flex;flex-direction:column;gap:4px}
+.half{height:16px;border-radius:6px;background:var(--relief);font-family:var(--mono);font-size:10px;line-height:16px;color:rgba(0,0,0,.55);font-weight:700}
+.half.vide{color:var(--ligne)}
+.half.vert{background:var(--menthe)}
+.half.orange{background:var(--ambre)}
+.half.rouge{background:var(--grenat);color:rgba(255,255,255,.85)}
+.tile.today{border-color:var(--menthe)}
+.legende{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:var(--brume)}
+.legende span{display:inline-flex;align-items:center;gap:6px}
+.pastille{width:12px;height:12px;border-radius:4px;display:inline-block}
+
+/* ---------- stats ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:620px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--velours);border:1px solid var(--ligne);border-radius:12px;padding:14px;text-align:center}
+.stat .n{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--menthe)}
+.stat .l{font-size:12px;color:var(--brume);margin-top:2px}
+
+/* ---------- quiz ---------- */
+.quiz-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.chip{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;background:var(--relief);border:1px solid var(--ligne);border-radius:99px;padding:5px 12px;color:var(--menthe)}
+.compteur{font-family:var(--mono);font-size:13px;color:var(--brume)}
+.bande{display:flex;gap:4px;margin-bottom:22px}
+.bande i{flex:1;height:6px;border-radius:3px;background:var(--relief)}
+.bande i.on{background:var(--ligne)}
+.bande i.ok{background:var(--menthe)}
+.bande i.ko{background:var(--grenat)}
+.q-img{display:block;max-width:280px;max-height:190px;width:auto;margin:0 auto 18px;border-radius:10px;border:1px solid var(--ligne);background:#fff}
+.q-txt{font-family:var(--display);font-weight:600;font-size:23px;line-height:1.3;margin:0 0 22px}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;background:var(--velours);border:1px solid var(--ligne);border-radius:12px;padding:14px 16px;font-size:16px;color:var(--craie);cursor:pointer;transition:border-color .12s ease,background .12s ease}
+.opt:hover:not([disabled]){border-color:var(--menthe)}
+.opt .num{font-family:var(--mono);font-size:12px;color:var(--brume);border:1px solid var(--ligne);border-radius:6px;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.opt.juste{border-color:var(--menthe);background:rgba(62,224,174,.12)}
+.opt.faux{border-color:var(--grenat);background:rgba(255,95,118,.12)}
+.opt[disabled]{cursor:default;opacity:.9}
+.verdict{margin-top:18px;border-radius:12px;border:1px solid var(--ligne);background:var(--velours);padding:16px 18px;display:none}
+.verdict.show{display:block;animation:pop .18s ease}
+@keyframes pop{from{transform:translateY(6px);opacity:0}to{transform:none;opacity:1}}
+.verdict .titre{font-family:var(--display);font-weight:800;font-size:17px;margin:0 0 6px}
+.verdict.ok .titre{color:var(--menthe)}
+.verdict.ko .titre{color:var(--grenat)}
+.verdict .bonne{font-size:14px;color:var(--brume);margin:0 0 10px}
+.verdict .bonne b{color:var(--craie)}
+.verdict .explic{font-size:15px;color:var(--craie);margin:0;line-height:1.6}
+.suite{margin-top:16px;display:flex;justify-content:flex-end}
+
+/* ---------- résultat ---------- */
+.res-head{text-align:center;padding:10px 0 4px}
+.res-score{font-family:var(--mono);font-size:52px;font-weight:700}
+.res-score.vert{color:var(--menthe)} .res-score.orange{color:var(--ambre)} .res-score.rouge{color:var(--grenat)}
+.res-sub{color:var(--brume);margin-top:2px}
+.jauge{height:10px;border-radius:5px;background:var(--relief);margin:20px 0 26px;overflow:hidden}
+.jauge>div{height:100%;width:0;background:var(--menthe);border-radius:5px;transition:width .8s ease}
+.themes{display:flex;flex-direction:column;gap:8px}
+.th-line{display:grid;grid-template-columns:110px 1fr 54px;align-items:center;gap:12px;font-size:14px}
+.th-line .bar{height:8px;border-radius:4px;background:var(--relief);overflow:hidden}
+.th-line .bar>div{height:100%;background:var(--menthe)}
+.th-line .sc{font-family:var(--mono);color:var(--brume);text-align:right}
+.recap{display:flex;flex-direction:column;gap:10px}
+.recap-line{display:flex;gap:10px;font-size:14px;line-height:1.5}
+.recap-line .dot{width:8px;height:8px;border-radius:50%;background:var(--grenat);flex:none;margin-top:6px}
+.recap-line b{display:block}
+.recap-line span.exp{color:var(--brume)}
+.res-actions{display:flex;gap:12px;justify-content:center;margin-top:28px;flex-wrap:wrap}
+.hidden{display:none!important}
+.note{font-size:13px;color:var(--brume)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="topbar">
+    <div class="mark">Le Quart <span>d'heure</span></div>
+    <div class="clock">série du <b id="c-day">—</b><br>prochaine série dans <b id="c-count">—</b></div>
+  </header>
+
+  <!-- ================= ACCUEIL ================= -->
+  <section id="v-home">
+    <h2 class="sect">Les deux séries du jour</h2>
+    <div class="series">
+      <div class="card serie-card moyen">
+        <div class="lvl">Série moyenne</div>
+        <div class="etat" id="etat-moyen"></div>
+        <button class="btn btn-go" id="go-moyen">Commencer la série moyenne</button>
+      </div>
+      <div class="card serie-card difficile">
+        <div class="lvl">Série difficile</div>
+        <div class="etat" id="etat-difficile"></div>
+        <button class="btn btn-go" id="go-difficile">Commencer la série difficile</button>
+      </div>
+    </div>
+
+    <h2 class="sect">Le tableau des jours</h2>
+    <div class="grid" id="grille"></div>
+    <div class="legende">
+      <span><i class="pastille" style="background:var(--menthe)"></i>12 à 15</span>
+      <span><i class="pastille" style="background:var(--ambre)"></i>8 à 11</span>
+      <span><i class="pastille" style="background:var(--grenat)"></i>7 ou moins</span>
+      <span><i class="pastille" style="background:var(--relief)"></i>non jouée</span>
+    </div>
+    <p class="note">Chaque case du jour comporte deux bandes : la série moyenne en haut, la difficile en bas. Une case vide signifie que la série n'a pas encore été jouée ce jour-là.</p>
+
+    <h2 class="sect">Statistiques</h2>
+    <div class="stats" id="stats"></div>
+
+    <h2 class="sect">Entraînement libre</h2>
+    <div class="card" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+      <span class="note" style="flex:1;min-width:220px">Quinze questions tirées au hasard, sans effet sur le tableau ni les statistiques.</span>
+      <button class="btn btn-ghost" id="train-moyen">Entraînement moyen</button>
+      <button class="btn btn-ghost" id="train-difficile">Entraînement difficile</button>
+    </div>
+  </section>
+
+  <!-- ================= QUIZ ================= -->
+  <section id="v-quiz" class="hidden">
+    <div class="quiz-top">
+      <span class="chip" id="q-theme">—</span>
+      <span class="compteur" id="q-compteur">1 / 15</span>
+    </div>
+    <div class="bande" id="bande"></div>
+    <img id="q-img" class="q-img hidden" alt="">
+    <h1 class="q-txt" id="q-txt"></h1>
+    <div class="opts" id="q-opts"></div>
+    <div class="verdict" id="verdict">
+      <p class="titre" id="v-titre"></p>
+      <p class="bonne" id="v-bonne"></p>
+      <p class="explic" id="v-explic"></p>
+    </div>
+    <div class="suite hidden" id="suite">
+      <button class="btn btn-go" id="next">Continuer</button>
+    </div>
+  </section>
+
+  <!-- ================= RÉSULTAT ================= -->
+  <section id="v-result" class="hidden">
+    <div class="res-head">
+      <div class="res-score" id="r-score">0 / 15</div>
+      <div class="res-sub" id="r-sub"></div>
+    </div>
+    <div class="jauge"><div id="r-jauge"></div></div>
+
+    <h2 class="sect">Score par thème</h2>
+    <div class="themes" id="r-themes"></div>
+
+    <h2 class="sect" id="r-recap-titre">Ce qui est passé à côté</h2>
+    <div class="recap" id="r-recap"></div>
+
+    <div class="res-actions">
+      <button class="btn btn-go" id="r-autre" >Jouer l'autre série du jour</button>
+      <button class="btn btn-ghost" id="home">Revenir à l'accueil</button>
+    </div>
+  </section>
+
+</div>
+
+<script src="questions.js"></script>
+<script>
+"use strict";
+/* =========================================================
+   1. OUTILS
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const THEMES = ["Histoire","Géographie","Drapeaux","Musique","Sport","Art","Cinéma"];
+const TAILLE = 15;
+const LS_DATA = "lqdh_v2_data";
+const LS_SESS = "lqdh_v2_session";
+
+function hash(str){ let h=1779033703^str.length; for(let i=0;i<str.length;i++){ h=Math.imul(h^str.charCodeAt(i),3432918353); h=(h<<13)|(h>>>19);} return (h^=h>>>16)>>>0; }
+function rng(seed){ return function(){ seed|=0; seed=(seed+0x6D2B79F5)|0; let t=Math.imul(seed^(seed>>>15),1|seed); t=(t+Math.imul(t^(t>>>7),61|t))^t; return ((t^(t>>>14))>>>0)/4294967296; }; }
+function shuffleSeeded(arr, seedStr){ const a=arr.slice(), r=rng(hash(seedStr)); for(let i=a.length-1;i>0;i--){ const j=Math.floor(r()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+/* Jour de jeu : la journée bascule à 20 h (20 h → nouvelle série = jour calendaire suivant) */
+function gameDayStr(){ const d=new Date(Date.now()+4*3600*1000); const p=n=>String(n).padStart(2,"0"); return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate()); }
+function dayNum(s){ const [y,m,d]=s.split("-").map(Number); return Math.floor(Date.UTC(y,m-1,d)/86400000); }
+function joliJour(s){ const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d).toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"}); }
+
+/* =========================================================
+   2. SAUVEGARDE (localStorage, avec garde-fous)
+   ========================================================= */
+function lireData(){
+  try{ const raw=localStorage.getItem(LS_DATA); if(raw){ const d=JSON.parse(raw); if(d && d.days) return d; } }catch(e){}
+  return { firstDay:null, days:{} };
+}
+function ecrireData(d){ try{ localStorage.setItem(LS_DATA, JSON.stringify(d)); }catch(e){ alert("Impossible d'enregistrer la partie : le stockage local est bloqué (navigation privée ?)."); } }
+function lireSession(){ try{ const raw=localStorage.getItem(LS_SESS); return raw?JSON.parse(raw):null; }catch(e){ return null; } }
+function ecrireSession(s){ try{ if(s) localStorage.setItem(LS_SESS, JSON.stringify(s)); else localStorage.removeItem(LS_SESS); }catch(e){} }
+
+let DATA = lireData();
+
+/* =========================================================
+   3. SÉRIE DU JOUR (déterministe : même série pour tous)
+   ========================================================= */
+function serieDuJour(diff, jour){
+  const bank = BANQUE[diff];
+  const ordre = shuffleSeeded([...bank.keys()], "lqdh-cycle-"+diff);
+  const debut = (dayNum(jour)*TAILLE) % bank.length;
+  const idx=[]; for(let i=0;i<TAILLE;i++) idx.push(ordre[(debut+i)%bank.length]);
+  return idx.map((k,i)=>{
+    const q=bank[k];
+    const opts=shuffleSeeded([0,1,2], jour+"|"+diff+"|"+i+"|"+q.q.length);
+    return { ...q, opts };
+  });
+}
+function serieEntrainement(diff){
+  const bank=BANQUE[diff];
+  const ordre=shuffleSeeded([...bank.keys()], "train-"+Date.now()+Math.random());
+  return ordre.slice(0,TAILLE).map(k=>{ const q=bank[k]; const o=[0,1,2].sort(()=>Math.random()-.5); return {...q,opts:o}; });
+}
+
+/* =========================================================
+   4. ÉTAT
+   ========================================================= */
+let S=null; // {jour,diff,training,serie,idx,score,parTheme,rates,verrou,reponses[]}
+
+function vue(id){ ["home","quiz","result"].forEach(v=>$("#v-"+v).classList.toggle("hidden", v!==id)); window.scrollTo(0,0); }
+
+/* =========================================================
+   5. ACCUEIL
+   ========================================================= */
+function classeScore(s){ return s>=12?"vert":(s>=8?"orange":"rouge"); }
+
+function rendreAccueil(){
+  const jour=gameDayStr();
+  $("#c-day").textContent=joliJour(jour);
+
+  ["moyen","difficile"].forEach(diff=>{
+    const res=DATA.days[jour] && DATA.days[jour][diff];
+    const etat=$("#etat-"+diff), btn=$("#go-"+diff);
+    if(res){
+      etat.innerHTML="Jouée aujourd'hui — <b>"+res.score+" / "+TAILLE+"</b>";
+      btn.disabled=true; btn.textContent="Série terminée, à demain 20 h";
+    }else{
+      etat.textContent="15 questions, identiques pour tout le monde aujourd'hui.";
+      btn.disabled=false; btn.textContent="Commencer la série "+(diff==="moyen"?"moyenne":"difficile");
+    }
+  });
+
+  /* --- grille chronologique : Jour 1 = première case en haut à gauche --- */
+  const g=$("#grille"); g.innerHTML="";
+  const first = DATA.firstDay || jour;
+  const n1=dayNum(first), n2=dayNum(jour);
+  let jours=[]; for(let n=n1;n<=n2;n++){ const d=new Date(n*86400000); const p=x=>String(x).padStart(2,"0"); jours.push(d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate())); }
+  const offset = Math.max(0, jours.length-12); // fenêtre des 12 derniers jours, ordre chronologique conservé
+  jours=jours.slice(-12);
+  jours.forEach((dstr,i)=>{
+    const t=document.createElement("div"); t.className="tile"+(dstr===jour?" today":"");
+    const num=offset+i+1;
+    const res=DATA.days[dstr]||{};
+    const demi=diff=>{
+      const r=res[diff];
+      if(!r) return '<div class="half vide">·</div>';
+      return '<div class="half '+classeScore(r.score)+'">'+r.score+'</div>';
+    };
+    t.innerHTML='<div class="jour">J'+num+'</div><div class="halves">'+demi("moyen")+demi("difficile")+'</div>';
+    g.appendChild(t);
+  });
+
+  /* --- stats --- */
+  const all=[]; Object.values(DATA.days).forEach(d=>{ if(d.moyen)all.push(d.moyen.score); if(d.difficile)all.push(d.difficile.score); });
+  const nb=all.length, moy=nb?(all.reduce((a,b)=>a+b,0)/nb):0, best=nb?Math.max(...all):0;
+  let streak=0; for(let n=n2;n>=n1;n--){ const d=new Date(n*86400000); const p=x=>String(x).padStart(2,"0"); const key=d.getUTCFullYear()+"-"+p(d.getUTCMonth()+1)+"-"+p(d.getUTCDate()); const rec=DATA.days[key]; if(rec&&(rec.moyen||rec.difficile)) streak++; else if(n!==n2) break; }
+  $("#stats").innerHTML=
+    '<div class="stat"><div class="n">'+nb+'</div><div class="l">séries jouées</div></div>'+
+    '<div class="stat"><div class="n">'+(nb?moy.toFixed(1):"—")+'</div><div class="l">score moyen</div></div>'+
+    '<div class="stat"><div class="n">'+(nb?best:"—")+'</div><div class="l">meilleure série</div></div>'+
+    '<div class="stat"><div class="n">'+streak+'</div><div class="l">jours d\'affilée</div></div>';
+}
+
+/* =========================================================
+   6. QUIZ
+   ========================================================= */
+function lancer(diff, training, reprise){
+  const jour=gameDayStr();
+  if(!training && DATA.days[jour] && DATA.days[jour][diff]) return;
+  S={ jour, diff, training:!!training,
+      serie: training ? serieEntrainement(diff) : serieDuJour(diff, jour),
+      idx:0, score:0, parTheme:{}, rates:[], verrou:false, reponses:[] };
+  if(reprise){
+    S.idx=reprise.idx; S.score=reprise.score; S.reponses=reprise.reponses;
+    reprise.reponses.forEach((ok,i)=>{ const q=S.serie[i]; S.parTheme[q.t]=S.parTheme[q.t]||{ok:0,tot:0}; S.parTheme[q.t].tot++; if(ok)S.parTheme[q.t].ok++; else S.rates.push(q); });
+  }
+  vue("quiz"); rendreQuestion();
+}
+
+function rendreQuestion(){
+  const q=S.serie[S.idx];
+  $("#q-theme").textContent=THEMES[q.t];
+  $("#q-compteur").textContent=(S.idx+1)+" / "+TAILLE;
+  const b=$("#bande"); b.innerHTML="";
+  for(let i=0;i<TAILLE;i++){ const seg=document.createElement("i");
+    if(i<S.reponses.length) seg.className=S.reponses[i]?"ok":"ko";
+    else if(i===S.idx) seg.className="on";
+    b.appendChild(seg); }
+  const img=$("#q-img");
+  if(q.img){ img.src=q.img; img.alt="Illustration de la question"; img.classList.remove("hidden"); img.onerror=()=>img.classList.add("hidden"); }
+  else img.classList.add("hidden");
+  $("#q-txt").textContent=q.q;
+  const opts=$("#q-opts"); opts.innerHTML="";
+  q.opts.forEach((oi,pos)=>{
+    const btn=document.createElement("button");
+    btn.className="opt"; btn.dataset.o=oi;
+    btn.innerHTML='<span class="num">'+(pos+1)+'</span><span>'+q.o[oi]+'</span>';
+    btn.addEventListener("click",()=>repondre(oi,btn));
+    opts.appendChild(btn);
+  });
+  $("#verdict").className="verdict"; $("#suite").classList.add("hidden");
+  S.verrou=false;
+}
+
+function repondre(oi, btn){
+  if(S.verrou) return; S.verrou=true;
+  const q=S.serie[S.idx], ok=(oi===0);
+  [...$("#q-opts").children].forEach(b=>{ b.disabled=true; if(+b.dataset.o===0) b.classList.add("juste"); });
+  if(!ok) btn.classList.add("faux");
+  S.reponses.push(ok);
+  S.parTheme[q.t]=S.parTheme[q.t]||{ok:0,tot:0}; S.parTheme[q.t].tot++;
+  if(ok){ S.score++; S.parTheme[q.t].ok++; } else S.rates.push(q);
+
+  const v=$("#verdict");
+  v.classList.add("show", ok?"ok":"ko");
+  $("#v-titre").textContent= ok?"Bonne réponse !":"Mauvaise réponse";
+  $("#v-bonne").innerHTML= ok?"":"La bonne réponse était : <b>"+q.o[0]+"</b>";
+  $("#v-bonne").style.display= ok?"none":"block";
+  $("#v-explic").textContent=q.e;
+  $("#suite").classList.remove("hidden");
+
+  /* bande */
+  const segs=$("#bande").children; segs[S.idx].className= ok?"ok":"ko";
+
+  /* sauvegarde de la progression en cours (série officielle uniquement) */
+  if(!S.training) ecrireSession({ jour:S.jour, diff:S.diff, idx:S.idx+1, score:S.score, reponses:S.reponses });
+}
+
+function suivant(){
+  if(S.idx+1<TAILLE){ S.idx++; rendreQuestion(); }
+  else finir();
+}
+
+/* =========================================================
+   7. RÉSULTAT
+   ========================================================= */
+function finir(){
+  if(!S.training){
+    DATA.firstDay = DATA.firstDay || S.jour;
+    DATA.days[S.jour]=DATA.days[S.jour]||{};
+    DATA.days[S.jour][S.diff]={ score:S.score, total:TAILLE };
+    ecrireData(DATA);
+    ecrireSession(null);
+  }
+  const cls=classeScore(S.score);
+  $("#r-score").textContent=S.score+" / "+TAILLE;
+  $("#r-score").className="res-score "+cls;
+  const phrases={vert:"Série verte — belle performance.",orange:"Série orange — il s'en est fallu de peu.",rouge:"Série rouge — la revanche est pour demain 20 h."};
+  $("#r-sub").textContent=(S.training?"Entraînement libre — ":"")+phrases[cls];
+
+  $("#r-themes").innerHTML=Object.entries(S.parTheme).map(([t,v])=>
+    '<div class="th-line"><span>'+THEMES[t]+'</span><span class="bar"><div style="width:'+(v.ok/v.tot*100)+'%"></div></span><span class="sc">'+v.ok+'/'+v.tot+'</span></div>').join("");
+
+  $("#r-recap-titre").textContent=S.rates.length?"Ce qui est passé à côté":"Sans faute";
+  $("#r-recap").innerHTML=S.rates.length
+    ? S.rates.map(q=>'<div class="recap-line"><span class="dot"></span><span><b>'+q.q+'</b>'+q.o[0]+' — <span class="exp">'+q.e+'</span></span></div>').join("")
+    : '<div class="recap-line"><span class="dot" style="background:var(--menthe)"></span><span><b>Quinze sur quinze.</b>Rien à reprendre.</span></div>';
+
+  /* bouton « jouer l'autre série » */
+  const autre=S.diff==="moyen"?"difficile":"moyen";
+  const dispo=!S.training && !(DATA.days[S.jour]&&DATA.days[S.jour][autre]);
+  $("#r-autre").classList.toggle("hidden",!dispo);
+  $("#r-autre").textContent="Jouer la série "+(autre==="moyen"?"moyenne":"difficile");
+  $("#r-autre").onclick=()=>{ $("#r-jauge").style.width="0"; lancer(autre,false); };
+
+  vue("result");
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ $("#r-jauge").style.width=Math.round(S.score/TAILLE*100)+"%"; }));
+}
+
+/* =========================================================
+   8. HORLOGE (reset à 20 h)
+   ========================================================= */
+function majHorloge(){
+  const now=new Date(); const cible=new Date(now);
+  cible.setHours(20,0,0,0); if(now>=cible) cible.setDate(cible.getDate()+1);
+  const ms=cible-now, h=Math.floor(ms/3600000), m=Math.floor(ms%3600000/60000), s=Math.floor(ms%60000/1000);
+  const p=n=>String(n).padStart(2,"0");
+  $("#c-count").textContent=p(h)+":"+p(m)+":"+p(s);
+  /* si la journée a basculé pendant que la page est ouverte */
+  if(!S && $("#c-day").textContent!==joliJour(gameDayStr())) rendreAccueil();
+}
+
+/* =========================================================
+   9. BRANCHEMENTS
+   ========================================================= */
+$("#go-moyen").addEventListener("click",()=>lancer("moyen",false));
+$("#go-difficile").addEventListener("click",()=>lancer("difficile",false));
+$("#train-moyen").addEventListener("click",()=>lancer("moyen",true));
+$("#train-difficile").addEventListener("click",()=>lancer("difficile",true));
+$("#next").addEventListener("click",suivant);
+$("#home").addEventListener("click",()=>{ $("#r-jauge").style.width="0"; S=null; rendreAccueil(); vue("home"); });
+
+document.addEventListener("keydown",e=>{
+  if(!S||$("#v-quiz").classList.contains("hidden")) return;
+  if(["1","2","3"].includes(e.key)){ const b=$("#q-opts").children[+e.key-1]; if(b&&!b.disabled) b.click(); }
+  else if(e.key==="Enter"||e.key===" "){ if(S.verrou){ e.preventDefault(); suivant(); } }
+});
+
+/* reprise d'une série interrompue */
+(function init(){
+  majHorloge(); setInterval(majHorloge,1000);
+  const sess=lireSession();
+  const jour=gameDayStr();
+  if(sess && sess.jour===jour && sess.idx<TAILLE && !(DATA.days[jour]&&DATA.days[jour][sess.diff])){
+    lancer(sess.diff,false,sess); return;
+  }
+  if(sess && sess.jour!==jour) ecrireSession(null);
+  rendreAccueil(); vue("home");
+})();
+</script>
+</body>
+</html>
