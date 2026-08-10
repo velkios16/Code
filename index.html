@@ -285,7 +285,10 @@ function shuffleSeeded(arr, seedStr){ const a=arr.slice(), r=rng(hash(seedStr));
 function gameDayStr(){ const d=new Date(Date.now()+4*3600*1000); const p=n=>String(n).padStart(2,"0"); return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate()); }
 function dayNum(s){ const [y,m,d]=s.split("-").map(Number); return Math.floor(Date.UTC(y,m-1,d)/86400000); }
 function joliJour(s){ const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d).toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"}); }
-
+/* Numéro public de la série — identique pour tous les joueurs.
+   À figer une fois pour toutes : ne plus jamais modifier cette date. */
+const JOUR_ZERO = dayNum("2026-08-01");
+const numeroSerie = j => dayNum(j) - JOUR_ZERO + 1;
 /* =========================================================
    2. SAUVEGARDE (localStorage, avec garde-fous)
    ========================================================= */
