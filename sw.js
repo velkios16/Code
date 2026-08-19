@@ -16,7 +16,7 @@
    ========================================================= */
 "use strict";
 
-const VERSION   = "1";
+const VERSION   = "2";
 const COQUILLE  = "lqdh-coquille-" + VERSION;
 const POLICES   = "lqdh-polices-"  + VERSION;
 const IMAGES    = "lqdh-images";          /* non versionné : les images ne périment pas */
